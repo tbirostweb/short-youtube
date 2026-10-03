@@ -1,0 +1,8 @@
+Titre de la vidéo : {videoTitle}
+Description de la vidéo : {videoDescription}
+Durée totale : {videoDuration} secondes
+Nombre d'extraits attendus : {clipCount}
+Durée cible par extrait : {targetDuration} secondes (minimum {minSeconds}, maximum {maxSeconds})
+
+Transcription horodatée, une ligne par segment, au format "[début-fin] texte" :
+{transcript}

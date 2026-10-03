@@ -1,0 +1,11 @@
+Musique de fond — Kevin MacLeod (incompetech.com)
+Licence : Creative Commons Attribution 4.0 (CC BY 4.0) — usage commercial OK AVEC crédit.
+Le bot ajoute AUTOMATIQUEMENT le crédit du morceau utilisé dans la description.
+
+Morceaux :
+  • [uplift] km_inspired.mp3  →  « Inspired » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0
+  • [uplift] km_fearless_first.mp3  →  « Fearless First » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0
+  • [uplift] km_life_of_riley.mp3  →  « Life of Riley » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0
+  • [tech] km_the_complex.mp3  →  « The Complex » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0
+  • [tech] km_digital_lemonade.mp3  →  « Digital Lemonade » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0
+  • [tech] km_blippy_trance.mp3  →  « Blippy Trance » by Kevin MacLeod (incompetech.com) — Licensed under Creative Commons: By Attribution 4.0

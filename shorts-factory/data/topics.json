@@ -1,0 +1,44 @@
+[
+  {
+    "id": "espace-trou-noir",
+    "topic": "3 faits hallucinants sur les trous noirs",
+    "keywords": ["space", "galaxy", "black hole", "stars"],
+    "hashtags": ["#espace", "#science", "#shorts"],
+    "cta": "Abonne-toi pour un fait par jour.",
+    "script": "Un trou noir peut ralentir le temps. Approche-toi assez près, et une seconde pour toi peut durer des années pour le reste de l'univers. Deuxième fait : rien ne s'en échappe, pas même la lumière, c'est pour ça qu'ils sont noirs. Et le plus dingue : au centre de presque chaque galaxie se cache un trou noir géant, des millions de fois plus lourd que le Soleil. Le nôtre s'appelle Sagittarius A. Abonne-toi pour un fait spatial par jour."
+  },
+  {
+    "id": "cerveau-sommeil",
+    "topic": "Ce que ton cerveau fait pendant que tu dors",
+    "keywords": ["brain", "sleep", "night", "neurons"],
+    "hashtags": ["#cerveau", "#sommeil", "#shorts"],
+    "cta": "Suis pour comprendre ton corps.",
+    "script": "Pendant que tu dors, ton cerveau ne s'éteint pas, il fait le ménage. Un vrai système de nettoyage évacue les déchets accumulés dans la journée. En même temps, il rejoue tes souvenirs pour les graver en mémoire. C'est pour ça qu'une nuit blanche détruit ta concentration. Et pendant les rêves, certaines zones sont plus actives qu'en plein éveil. Dormir, c'est littéralement s'entraîner sans bouger. Suis pour comprendre ton corps."
+  },
+  {
+    "id": "argent-interet-compose",
+    "topic": "Le secret des intérêts composés",
+    "keywords": ["money", "finance", "growth", "coins"],
+    "hashtags": ["#argent", "#finance", "#shorts"],
+    "cta": "Abonne-toi pour tes finances.",
+    "script": "Einstein l'appelait la huitième merveille du monde : les intérêts composés. L'idée est simple : tu gagnes des intérêts, puis des intérêts sur tes intérêts. Place cent euros par mois à sept pour cent, et en trente ans tu dépasses les cent vingt mille euros, alors que tu n'as versé qu'une fraction. Le vrai carburant, ce n'est pas la somme, c'est le temps. Plus tu commences tôt, plus la magie opère. Abonne-toi pour reprendre le contrôle de tes finances."
+  },
+  {
+    "id": "ocean-profondeurs",
+    "topic": "Pourquoi on connaît si mal les fonds marins",
+    "keywords": ["ocean", "deep sea", "underwater", "water"],
+    "hashtags": ["#ocean", "#science", "#shorts"],
+    "cta": "Suis pour explorer la planète.",
+    "script": null,
+    "prompt": "Explique en 90 mots pourquoi on a mieux cartographié la Lune que les fonds océaniques, avec un fait marquant et une chute impactante."
+  },
+  {
+    "id": "productivite-2min",
+    "topic": "La règle des 2 minutes pour arrêter de procrastiner",
+    "keywords": ["focus", "productivity", "clock", "work"],
+    "hashtags": ["#productivité", "#motivation", "#shorts"],
+    "cta": "Abonne-toi pour un conseil par jour.",
+    "script": null,
+    "prompt": "Présente la règle des deux minutes de façon punchy, avec un exemple concret et une phrase finale motivante."
+  }
+]

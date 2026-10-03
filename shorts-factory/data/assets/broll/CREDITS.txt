@@ -1,0 +1,9 @@
+Clips de fond (b-roll) — source : Pexels (https://www.pexels.com)
+Licence Pexels : gratuit, usage commercial autorisé, sans attribution obligatoire.
+
+Fichiers bg_<sujet>.mp4 : un clip vertical 1080x1920 réel, curé et raccord
+pour chaque sujet (téléchargés via tools/fetch_broll.py).
+
+Pour rafraîchir/changer un fond : relance `python -m tools.fetch_broll`,
+ou remplace un bg_<sujet>.mp4 par ton propre clip vertical.
+Un clip précis peut aussi être imposé par vidéo via background.local_file.

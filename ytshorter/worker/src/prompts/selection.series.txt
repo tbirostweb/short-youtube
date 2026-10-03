@@ -1,0 +1,8 @@
+MODE SÉRIE. Les {clipCount} extraits ne sont pas indépendants : ils forment
+une suite numérotée, publiée épisode par épisode.
+Choisis-les donc pour qu'ils se suivent dans l'ordre chronologique de la vidéo,
+et pour que chacun laisse une question ouverte à laquelle le suivant répond.
+Le premier extrait doit poser la promesse la plus forte de toute la vidéo.
+Le dernier doit apporter la conclusion ou la révélation.
+Le champ hook de chaque extrait annonce ce que la personne va apprendre,
+et donne envie de voir la partie suivante.

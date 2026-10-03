@@ -1,0 +1,33 @@
+# Secrets & tokens (TOUT credentials sauf le .gitkeep)
+.env
+credentials/*
+!credentials/.gitkeep
+
+# Sorties & cache
+output/
+data/shorts.db
+data/shorts.db-*
+data/cache/
+
+# Médias récupérés à la volée (Pexels/Pixabay pour la vidéo, incompetech pour
+# la musique) -> rien de stocké dans le repo/image (les .json de crédits et
+# .gitkeep restent suivis).
+data/assets/broll/*.mp4
+data/assets/music/*.mp3
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+.claude
+/claude
+./claude
+
+.dockerignore
+.env.example
+.idea

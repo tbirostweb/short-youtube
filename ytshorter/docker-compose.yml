@@ -1,0 +1,117 @@
+# ytshorter — stack complète, 5 services.
+# Aucun GPU requis. Démarrage : cp .env.example .env && docker compose up -d --build
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    # caching_sha2_password est le plugin d'authentification par défaut depuis
+    # MySQL 8.0 ; l'option --default-authentication-plugin a été supprimée en
+    # 8.4, donc aucune commande à surcharger ici.
+    volumes:
+      - mysql-data-v2:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      # Première initialisation sur un petit VPS : laisser le temps à MySQL de
+      # créer sa base avant de compter les échecs de la sonde.
+      start_period: 90s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ./api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MEDIA_DIR: /media
+      API_PORT: 3000
+    volumes:
+      - media:/media
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  worker:
+    build:
+      context: ./worker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MEDIA_DIR: /media
+    volumes:
+      - media:/media
+      - models:/models
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    # Pas de publication de port hôte : en production, Traefik route vers le
+    # conteneur (port 80) via le domaine. Publier 8080 sur l'hôte est inutile
+    # et entre en conflit si le port est déjà pris.
+    # Pour un accès local en dev, voir docker-compose.override.yml.
+    depends_on:
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # Repli LLM local, sans clé et sans quota. Optionnel, lourd en RAM.
+  # Activation : docker compose --profile ollama up -d
+  # Puis charger le modèle : docker compose exec ollama ollama pull qwen2.5:3b
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  # Volume renommé après une init corrompue au 1er déploiement (flag MySQL 8.4).
+  # L'ancien volume mysql-data reste sur le VPS, inutilisé ; suppression possible plus tard.
+  mysql-data-v2:
+  redis-data:
+  media:
+  models:
+  ollama-data:

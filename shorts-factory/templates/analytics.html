@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Analytics — Shorts Factory</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --card:#ffffff; --text:#1d1d1f; --muted:#6e6e73;
+    --line:#d2d2d7; --line-soft:#e8e8ed; --accent:#0071e3;
+    --green:#1c8a4d; --amber:#b25000;
+    --radius:20px; --radius-s:12px;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 8px 30px rgba(0,0,0,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#000; --card:#1c1c1e; --text:#f5f5f7; --muted:#98989d;
+      --line:#38383a; --line-soft:#2c2c2e; --accent:#0a84ff; --green:#30d158; --amber:#ff9f0a;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.35);}
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; min-height:100vh; line-height:1.47}
+  .wrap{max-width:940px; margin:0 auto; padding:48px 22px 80px}
+  .head-row{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px}
+  h1{font-size:30px; font-weight:600; letter-spacing:-.02em; margin:0}
+  a.ghost{font-size:14px; font-weight:550; color:var(--accent); text-decoration:none;
+    border:1px solid var(--line); border-radius:980px; padding:8px 16px}
+  .preview{background:color-mix(in srgb,var(--amber) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--amber) 30%,transparent); color:var(--amber);
+    border-radius:var(--radius-s); padding:11px 15px; font-size:13.5px; margin-bottom:26px}
+
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px}
+  .kpi{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px}
+  .kpi .l{font-size:13px; color:var(--muted); margin-bottom:8px}
+  .kpi .v{font-size:28px; font-weight:600; letter-spacing:-.02em}
+  .kpi .d{font-size:12.5px; color:var(--green); margin-top:4px}
+
+  .card{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:24px; margin-bottom:22px}
+  .card h2{font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.02em;
+    color:var(--muted); margin:0 0 18px}
+  .bars{display:flex; align-items:flex-end; gap:6px; height:120px}
+  .bars .bar{flex:1; background:linear-gradient(180deg,var(--accent),color-mix(in srgb,var(--accent) 55%,transparent));
+    border-radius:5px 5px 0 0; min-height:4px; transition:height .4s}
+
+  .chans{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .chan{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px}
+  .chan .top{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px}
+  .chan .name{font-size:16px; font-weight:600}
+  .chan .tag{font-size:11px; font-weight:600; color:var(--muted); border:1px solid var(--line);
+    border-radius:980px; padding:2px 9px}
+  .chan .stats{display:grid; grid-template-columns:1fr 1fr; gap:12px 10px; margin-bottom:14px}
+  .chan .s .l{font-size:12px; color:var(--muted)}
+  .chan .s .v{font-size:19px; font-weight:600; letter-spacing:-.01em}
+  .spark{display:flex; align-items:flex-end; gap:3px; height:44px}
+  .spark .b{flex:1; background:color-mix(in srgb,var(--accent) 65%,transparent); border-radius:2px; min-height:3px}
+  @media (max-width:680px){.kpis{grid-template-columns:1fr 1fr}.chans{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head-row">
+    <h1>Analytics</h1>
+    <a class="ghost" href="/">← Retour</a>
+  </div>
+  <div class="preview">👀 <b>Aperçu</b> — chiffres factices pour la maquette. Les vraies données apparaîtront après la connexion de tes chaînes YouTube (API YouTube Analytics).</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="card">
+    <h2>Vues — 14 derniers jours (tous comptes)</h2>
+    <div class="bars" id="globalBars"></div>
+  </section>
+
+  <section class="card" style="background:transparent; border:none; box-shadow:none; padding:0">
+    <h2>Par chaîne</h2>
+    <div class="chans" id="chans"></div>
+  </section>
+</div>
+
+<script>
+const nf=new Intl.NumberFormat("fr-FR");
+const money=n=>new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"}).format(n);
+
+function kpi(l,v,d){return `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${d?`<div class="d">${d}</div>`:""}</div>`;}
+function bars(series,cls){const max=Math.max(...series,1);
+  return series.map(v=>`<div class="${cls}" style="height:${Math.max(4,Math.round(v/max*100))}%"></div>`).join("");}
+
+async function load(){
+  const d=await fetch("/api/analytics").then(r=>r.json());
+  const t=d.total;
+  document.getElementById("kpis").innerHTML =
+    kpi("Abonnés", nf.format(t.subscribers), "maquette") +
+    kpi("Vues (30 j)", nf.format(t.views_30d), "") +
+    kpi("Revenus (30 j)", money(t.revenue_30d), "") +
+    kpi("Vidéos publiées", nf.format(t.videos), "");
+
+  // graphe global = somme des séries par chaîne
+  const len=d.channels[0].views_series.length;
+  const glob=Array.from({length:len},(_,i)=>d.channels.reduce((s,c)=>s+c.views_series[i],0));
+  document.getElementById("globalBars").innerHTML=bars(glob,"bar");
+
+  document.getElementById("chans").innerHTML = d.channels.map(c=>`
+    <div class="chan">
+      <div class="top"><div class="name">${c.name}</div><div class="tag">${c.lang.toUpperCase()}</div></div>
+      <div class="stats">
+        <div class="s"><div class="l">Abonnés</div><div class="v">${nf.format(c.subscribers)}</div></div>
+        <div class="s"><div class="l">Vues (30 j)</div><div class="v">${nf.format(c.views_30d)}</div></div>
+        <div class="s"><div class="l">Revenus (30 j)</div><div class="v">${money(c.revenue_30d)}</div></div>
+        <div class="s"><div class="l">Rétention moy.</div><div class="v">${c.avg_retention}%</div></div>
+      </div>
+      <div class="spark">${bars(c.views_series,"b")}</div>
+    </div>`).join("");
+}
+load();
+</script>
+</body>
+</html>

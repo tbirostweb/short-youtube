@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+/* Jetons de thème (Tailwind v4 : configuration en CSS). */
+@theme {
+  --color-ink: #0b1020;
+  --color-ink-soft: #131a33;
+  --color-ink-line: #26304f;
+  --color-accent: #38bdf8;
+  --color-accent-strong: #0ea5e9;
+  --color-highlight: #f472b6;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cible de focus toujours visible : accessibilité au clavier. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

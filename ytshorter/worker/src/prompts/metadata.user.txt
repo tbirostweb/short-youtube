@@ -1,0 +1,6 @@
+Titre de la vidéo d'origine : {videoTitle}
+Accroche de l'extrait : {hook}
+Durée de l'extrait : {duration} secondes
+
+Transcription de l'extrait :
+{transcript}

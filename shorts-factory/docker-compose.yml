@@ -1,0 +1,42 @@
+# =====================================================================
+#  Shorts Factory — déploiement (Dokploy « Compose » ou Docker local)
+#  Pour Dokploy, le plus simple est le type « Application » (build du
+#  Dockerfile) : voir docs/DEPLOY_DOKPLOY.md. Ce compose sert d'alternative
+#  et pour tester en local.
+# =====================================================================
+services:
+  dashboard:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"          # Dokploy mappe ton domaine sur ce port
+    environment:
+      # --- Sécurité (fortement recommandé en ligne) ---
+      DASHBOARD_USER: "${DASHBOARD_USER:-admin}"
+      DASHBOARD_PASSWORD: "${DASHBOARD_PASSWORD:-}"   # DÉFINIS-LE en prod !
+      # --- Clés (optionnelles) ---
+      PEXELS_API_KEY: "${PEXELS_API_KEY:-}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+    volumes:
+      - sf_output:/app/output          # vidéos générées (persistées)
+      - sf_data:/app/data              # base SQLite + assets modifiables
+      - ./credentials:/app/credentials # tokens OAuth YouTube (si upload)
+    command: ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  # Boucle autonome (optionnelle) : publie X Shorts/jour selon config.yaml.
+  # Décommente pour l'activer (partage les mêmes volumes).
+  # scheduler:
+  #   build: .
+  #   restart: unless-stopped
+  #   environment:
+  #     PEXELS_API_KEY: "${PEXELS_API_KEY:-}"
+  #   volumes:
+  #     - sf_output:/app/output
+  #     - sf_data:/app/data
+  #     - ./credentials:/app/credentials
+  #   command: ["python", "main.py", "schedule"]
+
+volumes:
+  sf_output:
+  sf_data:

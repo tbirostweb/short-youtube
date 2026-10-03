@@ -1,0 +1,2 @@
+Segments à traduire vers {language} :
+{segments}

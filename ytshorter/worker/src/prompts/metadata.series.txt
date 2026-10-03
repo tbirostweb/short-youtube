@@ -1,0 +1,7 @@
+MODE SÉRIE. Cet extrait est la partie {partIndex} sur {partTotal} d'une suite.
+Commence le titre par « Partie {partIndex}/{partTotal} — ».
+{nextTeaser}
+Termine la description et la légende TikTok par un appel à s'abonner formulé
+comme une raison de revenir, jamais comme une supplication : la personne
+s'abonne pour ne pas rater la suite, pas pour rendre service.
+N'annonce aucune date de publication : tu ne la connais pas.

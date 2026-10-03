@@ -1,0 +1,205 @@
+# =====================================================================
+#  Configuration principale du bot YouTube Shorts
+#  Tout se pilote ici. Les secrets (clés API) restent dans .env
+# =====================================================================
+
+project:
+  name: "Shorts Factory"
+  # Dossier où atterrissent les vidéos finales
+  output_dir: "output"
+  # Base SQLite qui garde l'historique (évite de refaire 2x le même sujet)
+  db_path: "data/shorts.db"
+  # Fichier de la file de sujets à traiter
+  topics_file: "data/topics.json"
+
+# ---------------------------------------------------------------------
+#  Génération du texte / script parlé
+# ---------------------------------------------------------------------
+script:
+  # "auto"   -> LLM si une clé est présente, sinon champ "script" du topic
+  # "llm"    -> force l'usage du LLM (erreur si aucune clé)
+  # "manual" -> utilise uniquement le champ "script" du topic
+  mode: "auto"
+  provider: "anthropic"        # "anthropic" ou "openai" (si mode llm/auto)
+  anthropic_model: "claude-sonnet-4-6"
+  openai_model: "gpt-4o-mini"
+  language: "fr"               # langue du script généré
+  # Longueur cible du texte parlé (mots). ~2.5 mots/s -> 40 mots ≈ 16s
+  target_words: 95
+  # Consigne de style injectée dans le prompt LLM
+  style: >
+    Écris un script de voix-off pour un YouTube Short vertical.
+    Accroche choc dès la 1re phrase, rythme rapide, phrases courtes,
+    ton dynamique, zéro intro molle. Termine par un call-to-action.
+    Réponds UNIQUEMENT par le texte à lire, sans didascalies ni emojis.
+
+# ---------------------------------------------------------------------
+#  Voix off (edge-tts, gratuit)
+# ---------------------------------------------------------------------
+tts:
+  # Voix les plus NATURELLES (multilingual, ton humain, convaincant) :
+  #   FR : fr-FR-RemyMultilingualNeural (H), fr-FR-VivienneMultilingualNeural (F)
+  #   EN : en-US-AndrewMultilingualNeural (H), en-US-AvaMultilingualNeural (F)
+  voice: "fr-FR-RemyMultilingualNeural"
+  rate: "+6%"                      # vitesse (-50%..+100%) : un peu d'énergie
+  volume: "+0%"
+  pitch: "+0Hz"
+
+# ---------------------------------------------------------------------
+#  Vidéo de fond (b-roll)
+# ---------------------------------------------------------------------
+background:
+  # "pexels" -> télécharge des clips verticaux via l'API (clé dans .env)
+  # "local"  -> pioche au hasard dans local_dir (des clips mer/nature y sont
+  #             déjà fournis : ocean, beach, forest, mountain)
+  # "color"  -> fond uni animé (aucune dépendance)
+  # "auto"   -> pexels si clé, sinon local si des clips existent, sinon color
+  source: "auto"
+  local_dir: "data/assets/broll"
+  # Clip précis à utiliser (nom de fichier dans local_dir). Vide = aléatoire.
+  # Surchargeable par vidéo (mode batch) ou par override.
+  local_file: ""
+  color: "0x0E1116"               # fond uni si source=color
+  # Lisibilité du texte par-dessus le b-roll (rendu plus cinéma) :
+  dim: 0.10                       # assombrissement 0..1 (monte si texte peu lisible)
+  saturation: 1.12                # 1.0 = neutre, >1 = couleurs plus punchy
+  # Requête Pexels : si vide, on utilise les "keywords" du topic
+  pexels_query: ""
+
+# ---------------------------------------------------------------------
+#  Sous-titres animés (style Shorts) — brûlés dans la vidéo
+# ---------------------------------------------------------------------
+captions:
+  enabled: true
+  # "word"  = un mot à la fois, apparaît PILE sur la voix (synchro parfaite,
+  #           mot-clé en jaune, reste en blanc) -> recommandé.
+  # "phrase"= groupe de N mots, mot actif surligné (on voit les mots à l'avance)
+  style: "word"
+  words_per_group: 3              # utilisé seulement en mode "phrase"
+  offset: 0.0                     # décalage synchro (s). +0.06 si texte en avance
+  emoji: true                     # fait "pop" un emoji sur les mots-clés (💰🤖📈…)
+  font: "Anton"                   # police virale (data/assets/fonts/Anton-Regular.ttf)
+  font_size: 118                  # gros = plus impactant en Short
+  primary_color: "#FFFFFF"        # couleur du texte
+  highlight_color: "#FFD400"      # couleur des mots-clés importants
+  outline_color: "#000000"
+  outline: 7                      # épaisseur du contour
+  shadow: 2
+  bold: false                     # Anton est déjà très grasse (pas de bold synthétique)
+  uppercase: true
+  margin_v: 640                   # distance depuis le bas (0..1920)
+
+# ---------------------------------------------------------------------
+#  Musique de fond (optionnel)
+# ---------------------------------------------------------------------
+music:
+  enabled: true                   # ignoré si aucun fichier dans music_dir
+  # "incompetech" -> morceaux Kevin MacLeod (CC BY 4.0) récupérés à la volée,
+  #                  SANS clé, zéro stockage, curés par ambiance. Recommandé.
+  # "openverse"   -> API Openverse (plus de variété, mais token conseillé).
+  # "local"       -> pioche dans music_dir (repli).
+  source: "incompetech"
+  music_dir: "data/assets/music"
+  # Volume de base (0..1). Le ducking la baisse encore sous la voix et la
+  # remonte dans les silences, donc on peut se permettre un peu de présence.
+  volume: 0.32
+  # Ambiance imposée par défaut ("uplift", "tech"...) ou vide = toutes.
+  # Surchargée par sujet dans tools/make_final.py (finance=uplift, IA=tech).
+  mood: ""
+
+# ---------------------------------------------------------------------
+#  Encodage vidéo
+# ---------------------------------------------------------------------
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  crf: 20                         # qualité H.264 (plus bas = mieux/plus lourd)
+  preset: "medium"
+  # Durée max de sécurité (s). La vidéo suit la longueur de la voix off.
+  max_duration: 60
+  # Barre de progression en haut (rétention + identité de chaîne)
+  progress_bar: true
+  progress_height: 12
+  progress_color: "#FFD400"       # vide = couleur d'accent des sous-titres
+
+# ---------------------------------------------------------------------
+#  Upload YouTube
+# ---------------------------------------------------------------------
+youtube:
+  enabled: true
+  client_secret: "credentials/client_secret.json"
+  token_file: "credentials/token.json"
+  privacy: "private"              # "private" | "unlisted" | "public"
+  category_id: "22"               # 22=People&Blogs, 24=Entertainment, 27=Education...
+  made_for_kids: false
+  # Programmation : si "public" + schedule_hours>0, publie plus tard.
+  # Nécessite privacy=private au moment de l'upload (géré automatiquement).
+  publish_delay_hours: 0
+  # Ajouté au titre/description pour aider la détection Short
+  shorts_tag: "#Shorts"
+  default_tags: ["shorts", "viral", "fyp"]
+
+# ---------------------------------------------------------------------
+#  Planification autonome (mode `schedule`)
+# ---------------------------------------------------------------------
+schedule:
+  # Heures de publication (fuseau du serveur), une vidéo par créneau
+  times: ["09:00", "13:00", "18:30"]
+  max_per_day: 3                  # garde-fou (quota API YouTube ≈ 6/j max)
+  jitter_minutes: 12              # décalage aléatoire ± pour faire naturel
+  upload: true                    # false = génère seulement, n'upload pas
+
+# ---------------------------------------------------------------------
+#  Chaînes YouTube — multi-comptes (2 FR + 2 EN par défaut)
+# ---------------------------------------------------------------------
+#  Chaque chaîne a sa voix, sa langue, son token OAuth et sa catégorie.
+#  - Le batch Excel cible une chaîne via la colonne "channel" (fr1, en1...).
+#  - Le client_secret.json est PARTAGÉ (youtube.client_secret) ; il suffit
+#    de s'authentifier avec le bon compte Google pour chaque chaîne :
+#        python main.py auth --channel fr1
+#  - Voix dispo : `edge-tts --list-voices` (ex fr-FR-*, en-US-*, en-GB-*).
+#  - Mets privacy: "unlisted" le temps de valider le rendu, puis "public".
+channels:
+  fr1:
+    name: "FR — Chaîne 1"
+    language: "fr"
+    voice: "fr-FR-DeniseNeural"
+    tts_rate: "+10%"
+    token_file: "credentials/token_fr1.json"
+    category_id: "27"            # 27=Education
+    privacy: "public"
+  fr2:
+    name: "FR — Chaîne 2"
+    language: "fr"
+    voice: "fr-FR-HenriNeural"
+    tts_rate: "+8%"
+    token_file: "credentials/token_fr2.json"
+    category_id: "24"            # 24=Entertainment
+    privacy: "public"
+  en1:
+    name: "EN — Channel 1"
+    language: "en"
+    voice: "en-US-AriaNeural"
+    tts_rate: "+8%"
+    token_file: "credentials/token_en1.json"
+    category_id: "27"
+    privacy: "public"
+  en2:
+    name: "EN — Channel 2"
+    language: "en"
+    voice: "en-US-GuyNeural"
+    tts_rate: "+6%"
+    token_file: "credentials/token_en2.json"
+    category_id: "24"
+    privacy: "public"
+
+# ---------------------------------------------------------------------
+#  Dashboard web (mode `serve`)
+# ---------------------------------------------------------------------
+dashboard:
+  # 127.0.0.1 = accessible seulement depuis CET ordinateur (sécurisé).
+  # Mets "0.0.0.0" seulement si tu veux y accéder depuis un autre appareil
+  # du réseau (le dashboard n'a pas de mot de passe : à éviter).
+  host: "127.0.0.1"
+  port: 8000

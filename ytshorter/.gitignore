@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.log
+media/
+models/
+.DS_Store
+coverage/
+
+# Config locale de l'IDE JetBrains
+.idea/

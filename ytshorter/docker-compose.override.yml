@@ -1,0 +1,11 @@
+# Surcharge chargée AUTOMATIQUEMENT par `docker compose up` en LOCAL uniquement.
+#
+# Dokploy lance `docker compose -f ./docker-compose.yml up` avec un -f explicite,
+# ce qui désactive le chargement auto de ce fichier : en production, le service
+# web n'expose donc AUCUN port hôte, et c'est Traefik qui route via le domaine.
+#
+# En local, ce fichier republie le port pour accéder à l'app sur http://localhost:8080.
+services:
+  web:
+    ports:
+      - "${WEB_PORT:-8080}:80"
