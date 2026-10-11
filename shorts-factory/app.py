@@ -59,6 +59,7 @@ async def _basic_auth(request, call_next):
 
 
 app.mount("/media", StaticFiles(directory=str(OUTPUT_DIR)), name="media")
+app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
 
 # --- état du job en cours (un seul à la fois) ---
 _job = {"running": False, "phase": "idle", "message": "", "video": None, "error": None}
